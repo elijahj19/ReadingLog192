@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
     <meta name="generator" content="Hugo 0.79.0">
-    <title>ReadingLog192</title>
+    <title>Accounts | ReadingLog192</title>
 
     <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/dashboard/">
 
@@ -71,12 +71,12 @@
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/">
+                            <a class="nav-link" aria-current="page" href="/">
                                 Home
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/accounts">
+                            <a class="nav-link active" aria-current="page" href="/accounts">
                                 Signup/Login
                             </a>
                         </li>
@@ -90,12 +90,27 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <h1>Welcome to ReadingLog192</h1>
-                <sub>By Elijah Jasso and Subin Kim</sub><br><br>
-                <p>Need help with scheduling and tracking your class readings?<br>
-                Want to view interesting visualizations of your progress and stats?<br>
-                <a href="/accounts">Join</a> ReadingLog192 today!</p>
-                
+                <h1>Signup/Login</h1>
+                <div class="col-md-5">
+                    <form class="form-signin" method="POST" action="/signup/">
+                        {% csrf_token %}
+                        <h1 class="h3 mb-3 font-weight-normal">Signup</h1>
+                        <input type="email" name="email" class="form-control" placeholder="Email" required autofocus>
+                        <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign up</button>
+                    </form>
+                    <br>
+                    <hr>
+                    <br>
+                    <form class="form-signin" method="POST" action="/login/">
+                        {% csrf_token %}
+                        <h1 class="h3 mb-3 font-weight-normal">Login</h1>
+                        <input type="text" name="username" class="form-control" placeholder="Username" required autofocus>
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+                    </form>
+                </div>
             </main>
         </div>
     </div>
