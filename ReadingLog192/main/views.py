@@ -13,6 +13,10 @@ def splash_view(request):
     # otherwise render the default landing page for non-logged in users
     return render(request, 'splash.html', {})
 
+# this is the about page
+def about_view(request):
+    return render(request, 'about.html', {})
+
 # this is the dashboard view for logged in users
 def dashboard_view(request):
     # if user is not logged in, reroute them to signin page and display error
