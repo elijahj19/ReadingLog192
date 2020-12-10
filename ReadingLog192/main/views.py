@@ -39,7 +39,7 @@ def accounts_view(request):
 def login_view(request):
     # if the user is already logged in redirect them to their dashboard
     if request.user.is_authenticated:
-        return redirect('/dashboard')
+        return redirect('/dashboard?alreadyLoggedIn=True')
     print("login", request.POST['username'], request.POST['password'])
     username, password = request.POST['username'], request.POST['password']
 
@@ -53,6 +53,9 @@ def login_view(request):
 
 # this handles a user trying to sign up
 def signup_view(request):
+    # if the user is already logged in redirect them to their dashboard
+    if request.user.is_authenticated:
+        return redirect('/dashboard?alreadyLoggedIn=True')
     print("signup", request.POST['username'], request.POST['password'], request.POST['email'])
     # error checking if all required fields are there and user already exists with username or email
     if 'username' not in request.POST or 'password' not in request.POST or 'email' not in request.POST:
