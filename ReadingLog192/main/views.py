@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from main.models import Course, Paper, User
+import datetime
 
 
 ## PAGE GET REQUESTS
@@ -22,9 +23,39 @@ def dashboard_view(request):
     # if user is not logged in, reroute them to signin page and display error
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
+        
     # return the dashboard view for the user
-    # TODO the logic for the page
-    return render(request, 'dashboard.html', {})
+    if request.method == 'POST':
+        dueDate=request.POST['dueDate']
+        format = '%Y-%m-%d %H:%M'
+        try:
+            datetime.datetime.strptime(dueDate, format)
+        except ValueError:
+            return redirect('/dashboard?invalidDate=True')
+
+        title=request.POST['title']
+        author=request.POST['author']
+
+        pages=int(request.POST['pages'])
+        if(pages < 0):
+            return redirect('/dashboard?invalidPages=True')
+
+        url=request.POST['url']
+        course, created=Course.objects.get_or_create(name=request.POST['course'], isClassActive=True)
+        paper = Paper.objects.create(
+            dueDate=dueDate,
+            title=title,
+            author=author,
+            totalPages=pages,
+            course=course,
+            url=url
+        )
+        request.user.courses.add(course)
+        request.user.papers.add(paper)
+    # if get, render the page
+    papers = request.user.papers.all().order_by('dueDate') # show closer deadlines first
+        
+    return render(request, 'dashboard.html', {'papers': papers})
 
 # this is the HTML view for logging in signing up
 def accounts_view(request):
@@ -87,3 +118,15 @@ def logout_view(request):
     logout(request)
     print('Logout Successful')
     return redirect('/')
+
+# handles reading progress update
+def progress_view(request):
+    if request.method == 'POST':
+        paper = Paper.objects.get(title=request.POST['paper'])
+        oldPage = paper.readPages
+        newPage = int(request.POST['readPages'])
+        if(newPage > paper.totalPages or newPage < 0 or newPage < oldPage):
+            return redirect('/dashboard?invalidPage=True')
+        paper.readPages = newPage
+        paper.save()
+    return redirect('/dashboard')

@@ -14,7 +14,7 @@ class Course(models.Model):
 # model for paper
 class Paper(models.Model):
     title = models.CharField(max_length=200, blank=False) # title of the paper, required
-    author = models.CharField(max_length=200, blank=True) # author of the paper, not  required
+    author = models.CharField(max_length=200, blank=True) # author of the paper, not required
     totalPages = models.IntegerField(default=1) # number of pages in the paper (set by user), defaults to 1
     readPages = models.IntegerField(default=0) # number of pages the user has read, defaults to 0
     url = models.CharField(max_length=200, blank=True) # url link of the paper, not required
@@ -25,7 +25,7 @@ class Paper(models.Model):
 
     # string representation of paper
     def __str__(self):
-        return f'{self.title} by {self.author}, {self.totalPages} pages due {self.time}'
+        return f'{self.title} by {self.author}, {self.totalPages} pages due {self.addDate}'
 
 ## extended version of user, custom user class
 class User(AbstractUser):
