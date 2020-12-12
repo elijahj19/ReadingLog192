@@ -107,8 +107,6 @@
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <h1>{{author}}</h1>
                 <h2>Upcoming Readings</h2>
-                {% for paper in papers %}
-                {% if paper.readPages != paper.totalPages %}
                 <div class="table-responsive">
                     <table class="table table-striped table-sm">
                         <thead>
@@ -118,13 +116,13 @@
                                 <th>Author</th>
                                 <th>Pages</th>
                                 <th>Class</th>
-                                {% if paper.url != '' %}
                                 <th>Link</th>
-                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Article info template -->
+                            {% for paper in papers %}
+                            {% if paper.readPages != paper.totalPages %}
                             <tr>
                                 <td>{{paper.dueDate}}</td>
                                 <td><a href="link to reading page">{{paper.title}}</a></td>
@@ -132,20 +130,21 @@
                                 <td>{{paper.readPages}}/{{paper.totalPages}}</td>
                                 <td><a href="/classReadings?name={{paper.course.name}}">{{paper.course}}</a></td>
                                 <!-- only display url if user inputs one -->
-                                {% if paper.url != '' %}
-                                <td><a href={{paper.url}}>Link</a></td>
-                                {% endif %}
+                                <td>
+                                    {% if paper.url != '' %}
+                                    <a href={{paper.url}}>Link</a>
+                                    {% else %}
+                                    &nbsp;
+                                    {% endif %}
+                                </td>
                             </tr>
-
+                            {% endif %}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
-                {% endif %}
-                {% endfor %}
                 
                 <h2>Finished Readings</h2>
-                {% for paper in papers %}
-                {% if paper.readPages == paper.totalPages %}
                 <div class="table-responsive">
                     <table class="table table-striped table-sm">
                         <thead>
@@ -162,6 +161,8 @@
                         </thead>
                         <tbody>
                             <!-- Article info template -->
+                            {% for paper in papers %}
+                            {% if paper.readPages == paper.totalPages %}
                             <tr>
                                 <td>{{paper.dueDate}}</td>
                                 <td><a href="link to reading page">{{paper.title}}</a></td>
@@ -169,16 +170,20 @@
                                 <td>{{paper.readPages}}/{{paper.totalPages}}</td>
                                 <td><a href="link to class page">{{paper.course}}</a></td>
                                 <!-- only display url if user inputs one -->
-                                {% if paper.url != '' %}
-                                <td><a href={{paper.url}}>Link</a></td>
-                                {% endif %}
+                                <td>
+                                    {% if paper.url != '' %}
+                                    <a href={{paper.url}}>Link</a>
+                                    {% else %}
+                                    &nbsp;
+                                    {% endif %}
+                                </td>
                             </tr>
+                            {% endif %}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </main>
-            {% endif %}
-            {% endfor %}
         </div>
     </div>
 

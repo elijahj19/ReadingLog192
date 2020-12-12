@@ -92,7 +92,12 @@ def authors_view(request):
         return redirect('/accounts?needLogin=True')
     
     authors = []
-    papers = request.user.papers.all().order_by('dueDate')
+    papers = []
+    # in case papers hasn't been setup in users yet
+    try:
+        papers = request.user.papers.all().order_by('dueDate')
+    except:
+        pass
     for paper in papers:
         if paper.author not in authors and paper.author != '':
             authors.append(paper.author)
@@ -104,7 +109,7 @@ def authorReadings_view(request):
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
     author=request.GET['name']
-    papers = Paper.objects.filter(author=author)
+    papers = Paper.objects.filter(author=author).order_by('dueDate')
     return render(request, 'authorReadings.html', {"papers": papers, "author": author})
 ## ----------------------------------------------------------------------------------------
 
