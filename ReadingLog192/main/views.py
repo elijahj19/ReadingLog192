@@ -60,8 +60,35 @@ def dashboard_view(request):
         request.user.papers.add(paper)
     # if get, render the page
     papers = request.user.papers.all().order_by('dueDate') # show closer deadlines first
+
+    # create dashboard image showing graph of how many pages need to read a day
+    today = timezone.now()
+    papersFiltered = request.user.papers.filter(dueDate__gte=today).order_by('dueDate')
+    pagesDays = []
+    dates = []
+    for paper in papersFiltered:
+        daysUntil = (paper.dueDate.date() - today.date()).days + 1
+        pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
+        for i in range(daysUntil):
+            if len(pagesDays) > i:
+                pagesDays[i] += pagesPerDay
+            else:
+                pagesDays.append(pagesPerDay)
+                dates.append(today.date() + datetime.timedelta(days=i))
+
+    plt.plot(dates, pagesDays)
+    plt.ylabel('Pages To Read')
+    plt.xlabel('Date')
+
+    fig = plt.gcf()
+    fig.set_size_inches(16, 6)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    uri = urllib.parse.quote(base64.b64encode(buf.read()))
+    plt.close()
         
-    return render(request, 'dashboard.html', {'papers': papers})
+    return render(request, 'dashboard.html', {'papers': papers, 'pagesPerDayGraph': uri})
 
 # this is the HTML view for logging in signing up
 def accounts_view(request):
@@ -162,7 +189,7 @@ def readingProgress_view(request):
     uri = urllib.parse.quote(base64.b64encode(buf.read()))
     graphs.append({'title': 'Total Pages Per Day', 'image': uri})
     plt.close()
-    
+
     # Total Pages Needed to Read per Day by Class
     for course in courses:
         papersFiltered = course.paper.filter(dueDate__gte=today, user=request.user).order_by('dueDate')
@@ -191,8 +218,70 @@ def readingProgress_view(request):
         graphs.append({'title': f'{course.name} Pages Per Day', 'image': uri})
         plt.close()
 
-    
     return render(request, 'readingProgress.html', {"graphs": graphs})
+
+def readingStats_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+
+    graphs = []
+    courses = request.user.courses.all()
+    papers = request.user.papers.all().order_by('dueDate')
+
+    # Text displayed stats
+    pagesRead = 0 # how many pages has this user read
+    papersRead = 0
+    avgPaperLength = 0 # average length of paper
+    for paper in papers:
+        pagesRead += paper.readPages
+        avgPaperLength += paper.totalPages
+        if paper.readPages == paper.totalPages:
+            papersRead += 1
+    avgPaperLength /= len(papers) if len(papers) > 0 else 1
+    
+    # Number of Readings By Author
+    authors = {}
+    for paper in papers:
+        if paper.author in authors:
+            authors[paper.author] += 1
+        else:
+            authors[paper.author] = 1
+    x = [author for author in authors]
+    y = [authors[author] for author in authors]
+    plt.bar(x, y)
+    plt.ylabel('Readings Assigned')
+    fig = plt.gcf()
+    fig.set_size_inches(16, 6)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    uri = urllib.parse.quote(base64.b64encode(buf.read()))
+    graphs.append({'title': f'Readings Assigned Per Author', 'image': uri})
+    plt.close()
+
+    # Number of Pages By Course graph
+    pages = []
+    courseNames = []
+    for course in courses:
+        papersFiltered = course.paper.filter(user=request.user)
+        pages.append(0)
+        courseNames.append(course.name)
+        for paper in papersFiltered:
+            pages[-1] += paper.totalPages
+
+    plt.bar(courseNames, pages)
+    plt.ylabel('Pages To Read')
+    fig = plt.gcf()
+    fig.set_size_inches(16, 6)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    uri = urllib.parse.quote(base64.b64encode(buf.read()))
+    graphs.append({'title': f'Number of Pages Assigned By Course', 'image': uri})
+    plt.close()
+
+    return render(request, 'readingStats.html', {'graphs': graphs, 'pagesRead': pagesRead, 'avgPaperLength': avgPaperLength, 'papersRead': papersRead})
 
 ## ----------------------------------------------------------------------------------------
 
