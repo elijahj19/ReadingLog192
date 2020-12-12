@@ -5,7 +5,7 @@ from django.db.models.fields import related
 
 # model for courses
 class Course(models.Model):
-    name = models.CharField(max_length=12, unique=True) # name of the class
+    name = models.CharField(max_length=12) # name of the class
     isClassActive = models.BooleanField() # is the currently active, not a previously taken class
     # string representation of course
     def __str__(self):
