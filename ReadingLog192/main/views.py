@@ -23,7 +23,7 @@ def dashboard_view(request):
     # if user is not logged in, reroute them to signin page and display error
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
-        
+
     # return the dashboard view for the user
     if request.method == 'POST':
         dueDate=request.POST['dueDate']
@@ -66,6 +66,46 @@ def accounts_view(request):
     #
     return render(request, 'accounts.html', {})
 
+# shows the classes for which the user has readings for
+def classes_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+    classes = request.user.courses.all()
+    papers = request.user.papers.all().order_by('dueDate')
+    return render(request, 'classes.html', {'classes': classes, 'papers': papers})
+
+# shows all the upcoming and finished readings for a course
+def classReadings_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+    
+    course = Course.objects.get(name=request.GET['name'])
+    papers = Paper.objects.filter(course=course)
+    return render(request, 'classReadings.html', {"papers": papers, "course": course})
+
+# shows the authors for which the user has readings for
+def authors_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+    
+    authors = []
+    papers = request.user.papers.all().order_by('dueDate')
+    for paper in papers:
+        if paper.author not in authors and paper.author != '':
+            authors.append(paper.author)
+    return render(request, 'authors.html', {'authors': authors, 'papers': paper})
+
+# shows all the upcoming and finished readings for an author
+def authorReadings_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+    author=request.GET['name']
+    papers = Paper.objects.filter(author=author)
+    return render(request, 'authorReadings.html', {"papers": papers, "author": author})
 ## ----------------------------------------------------------------------------------------
 
 ## REQUESTs

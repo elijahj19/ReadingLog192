@@ -1,4 +1,4 @@
-<!-- dashboard.html is the landing page for logged in users, shows overview of info for readings -->
+<!-- classes.html is the page that shows all the classes for which the user has readings for -->
 <!-- Only authenticated users can access this page, otherwise they are rerouted -->
 <!doctype html>
 <html lang="en">
@@ -105,50 +105,7 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div
-                    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard</h1>
-                </div>
-                
-                <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
-                <h2>Log Progress</h2>
-                <form method="POST" action="/progress/">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="paper">Select paper</label>
-                        <select class="form-control" name="paper">
-                          {% for paper in papers%}
-                          <option value="{{paper.title}}">{{paper.title}}</option>
-                          {% endfor %}
-                        </select>
-                        {% if 'invalidPage' in request.GET %}
-                        <div style="color: red">Please enter a valid page number!</div>
-                        {% endif %}
-                        <input name="readPages" class="form-control" placeholder="What page are you on now?" required/>
-                        <button type="submit" class="btn btn-primary">Update Reading Progress!</button>
-                      </div>
-                </form>
- 
-                <h2>New Reading</h2>
-                <form method="POST" action="/dashboard/">
-                    {% csrf_token %}
-                    <!-- TODO: error handling for wrong format inputs -->
-                    {% if 'invalidDate' in request.GET %}
-                        <div style="color: red">Please enter a valid date!</div>
-                    {% endif %}
-                    <input name="dueDate" class="form-control" placeholder="When is this paper due? (YYYY-MM-DD HH:MM)" required/>
-                    <input name="title" class="form-control" placeholder="What's the title?" required/>
-                    <input name="author" class="form-control" placeholder="Who's the author?" />
-                    {% if 'invalidPages' in request.GET %}
-                        <div style="color: red">Please enter a valid number of pages!</div>
-                    {% endif %}
-                    <input name="pages" class="form-control" placeholder="How many pages are there?" required/>
-                    <input name="course" class="form-control" placeholder="What course is this for?" required/>
-                    <input name="url" class="form-control" placeholder="Enter url to paper here, if available!" />
-                    <button type="submit" class="btn btn-primary">Add to Reading List!</button>
-                </form>
-                <br />
-
+                <h1>{{author}}</h1>
                 <h2>Upcoming Readings</h2>
                 {% for paper in papers %}
                 {% if paper.readPages != paper.totalPages %}
@@ -198,8 +155,9 @@
                                 <th>Author</th>
                                 <th>Pages</th>
                                 <th>Class</th>
+                                {% if paper.url != '' %}
                                 <th>Link</th>
-
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
