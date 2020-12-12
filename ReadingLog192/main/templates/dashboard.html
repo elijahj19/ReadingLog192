@@ -198,8 +198,9 @@
                                 <th>Author</th>
                                 <th>Pages</th>
                                 <th>Class</th>
+                                {% if paper.url != '' %}
                                 <th>Link</th>
-
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
