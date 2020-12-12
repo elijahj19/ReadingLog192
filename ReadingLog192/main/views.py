@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from main.models import Course, Paper, User
 import datetime
+from django.utils import timezone
+import matplotlib
+matplotlib.use('Agg') 
+import matplotlib.pyplot as plt
+import io
+import urllib, base64
 
 
 ## PAGE GET REQUESTS
@@ -80,6 +86,9 @@ def classReadings_view(request):
     # if user is not logged in, reroute them to signin page and display error
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
+    # if class name does not exist, redirect to classes
+    if 'name' not in request.GET or not request.user.courses.filter(name=request.GET['name']).exists():
+        return redirect('/classes')
     
     course = request.user.courses.get(name=request.GET['name'])
     papers = request.user.papers.filter(course=course).order_by('dueDate')
@@ -108,9 +117,83 @@ def authorReadings_view(request):
     # if user is not logged in, reroute them to signin page and display error
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
+    # if author name does not exist in GET request return to authors page, if author does not exist, an empty page will be shown with 0 readings
+    if 'name' not in request.GET:
+        return redirect('/authors')
     author=request.GET['name']
     papers = request.user.papers.filter(author=author).order_by('dueDate')
     return render(request, 'authorReadings.html', {"papers": papers, "author": author})
+
+# shows the classes for which the user has readings for
+def readingProgress_view(request):
+    # if user is not logged in, reroute them to signin page and display error
+    if not request.user.is_authenticated:
+        return redirect('/accounts?needLogin=True')
+    
+    graphs = []
+    courses = request.user.courses.all()
+    papers = request.user.papers.all().order_by('dueDate')
+    dateFormat = '%Y-%m-%d %H:%M'
+    today = timezone.now()
+
+    # Total Pages Needed to Read per Day until all due dates
+    papersFiltered = request.user.papers.filter(dueDate__gte=today).order_by('dueDate')
+    pagesDays = []
+    dates = []
+    for paper in papersFiltered:
+        daysUntil = (paper.dueDate.date() - today.date()).days + 1
+        pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
+        for i in range(daysUntil):
+            if len(pagesDays) > i:
+                pagesDays[i] += pagesPerDay
+            else:
+                pagesDays.append(pagesPerDay)
+                dates.append(today.date() + datetime.timedelta(days=i))
+
+    plt.plot(dates, pagesDays)
+    plt.ylabel('Pages To Read')
+    plt.xlabel('Date')
+
+    fig = plt.gcf()
+    fig.set_size_inches(16, 6)
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    uri = urllib.parse.quote(base64.b64encode(buf.read()))
+    graphs.append({'title': 'Total Pages Per Day', 'image': uri})
+    plt.close()
+    
+    # Total Pages Needed to Read per Day by Class
+    for course in courses:
+        papersFiltered = course.paper.filter(dueDate__gte=today, user=request.user).order_by('dueDate')
+        pagesDays = []
+        dates = []
+        for paper in papersFiltered:
+            daysUntil = (paper.dueDate.date() - today.date()).days + 1
+            pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
+            for i in range(daysUntil):
+                if len(pagesDays) > i:
+                    pagesDays[i] += pagesPerDay
+                else:
+                    pagesDays.append(pagesPerDay)
+                    dates.append(today.date() + datetime.timedelta(days=i))
+
+        plt.plot(dates, pagesDays, label=course.name)
+        plt.ylabel('Pages To Read')
+        plt.xlabel('Date')
+
+        fig = plt.gcf()
+        fig.set_size_inches(16, 6)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        uri = urllib.parse.quote(base64.b64encode(buf.read()))
+        graphs.append({'title': f'{course.name} Pages Per Day', 'image': uri})
+        plt.close()
+
+    
+    return render(request, 'readingProgress.html', {"graphs": graphs})
+
 ## ----------------------------------------------------------------------------------------
 
 ## REQUESTs
