@@ -81,8 +81,8 @@ def classReadings_view(request):
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
     
-    course = Course.objects.get(name=request.GET['name'])
-    papers = Paper.objects.filter(course=course).order_by('dueDate')
+    course = request.user.courses.get(name=request.GET['name'])
+    papers = request.user.papers.filter(course=course).order_by('dueDate')
     return render(request, 'classReadings.html', {"papers": papers, "course": course})
 
 # shows the authors for which the user has readings for
@@ -109,7 +109,7 @@ def authorReadings_view(request):
     if not request.user.is_authenticated:
         return redirect('/accounts?needLogin=True')
     author=request.GET['name']
-    papers = Paper.objects.filter(author=author).order_by('dueDate')
+    papers = request.user.papers.filter(author=author).order_by('dueDate')
     return render(request, 'authorReadings.html', {"papers": papers, "author": author})
 ## ----------------------------------------------------------------------------------------
 
