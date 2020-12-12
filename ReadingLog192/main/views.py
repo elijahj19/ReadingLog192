@@ -82,7 +82,7 @@ def classReadings_view(request):
         return redirect('/accounts?needLogin=True')
     
     course = Course.objects.get(name=request.GET['name'])
-    papers = Paper.objects.filter(course=course)
+    papers = Paper.objects.filter(course=course).order_by('dueDate')
     return render(request, 'classReadings.html', {"papers": papers, "course": course})
 
 # shows the authors for which the user has readings for
