@@ -344,7 +344,7 @@ def logout_view(request):
 # handles reading progress update
 def progress_view(request):
     if request.method == 'POST':
-        paper = Paper.objects.get(title=request.POST['paper'])
+        paper = Paper.objects.get(title=request.POST['paper'], user=request.user)
         oldPage = paper.readPages
         newPage = int(request.POST['readPages'])
         if(newPage > paper.totalPages or newPage < 0 or newPage < oldPage):
