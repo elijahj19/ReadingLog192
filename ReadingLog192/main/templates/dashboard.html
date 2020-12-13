@@ -178,7 +178,7 @@
                             {% if paper.readPages != paper.totalPages %}
                             <tr>
                                 <td>{{paper.dueDate}}</td>
-                                <td><a href="link to reading page">{{paper.title}}</a></td>
+                                <td>{{paper.title}}</td>
                                 <td><a href="/authorReadings?name={{paper.author}}">{{paper.author}}</a></td>
                                 <td>{{paper.readPages}}/{{paper.totalPages}}</td>
                                 <td><a href="/classReadings?name={{paper.course.name}}">{{paper.course}}</a></td>
@@ -215,7 +215,7 @@
                             {% if paper.readPages == paper.totalPages %}
                             <tr>
                                 <td>{{paper.dueDate}}</td>
-                                <td><a href="link to reading page">{{paper.title}}</a></td>
+                                <td>{{paper.title}}</td>
                                 <td><a href="link to author page">{{paper.author}}</a></td>
                                 <td>{{paper.readPages}}/{{paper.totalPages}}</td>
                                 <td><a href="link to class page">{{paper.course}}</a></td>
