@@ -90,6 +90,9 @@
                 </div>
             </nav>
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                {% if 'needLogin' in request.GET %}
+                <div style="color: red">You need to login to do that</div>
+                {% endif %}
                 {% if 'missingSignupParameter' in request.GET %}
                 <div style="color: red">Missing required signup field</div>
                 {% endif %}
