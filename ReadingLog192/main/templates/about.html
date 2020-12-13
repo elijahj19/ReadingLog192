@@ -74,21 +74,65 @@
             <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/">
-                                Home
+                        {% if request.user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="/">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/classes">
+                                    Classes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/authors">
+                                    Authors
+                                </a>
+                            </li>
+                            
+                        </ul>
+
+                        <h6
+                            class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                            <span>Stats</span>
+                            <a class="link-secondary" href="#" aria-label="Add a new report">
+                                <span data-feather="plus-circle"></span>
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/accounts">
-                                Signup/Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="/about">
-                                About
-                            </a>
-                        </li>
+                        </h6>
+                        <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="/readingProgress">
+                                    Reading Progress
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/readingStats">
+                                    Reading Stats
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="/about">
+                                    About
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="/">
+                                    Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" aria-current="page" href="/accounts">
+                                    Signup/Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="/about">
+                                    About
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
 
                 </div>
@@ -97,8 +141,25 @@
                 <br>
                 <h1>About</h1>
                 <sub>By Elijah Jasso and Subin Kim</sub><br><br>
-                <p>Need help with scheduling and tracking your class readings?<br>
-                Want to view interesting visualizations of your progress and stats?<br>
+                <h4>Never miss a class reading again with ReadingLog192!</h4>
+                Ever missed a deadline for a reading just because there are just so. many. readings. that it's impossible to keep all of them organized?<br>
+                ReadingLog192 will be your best reading-organizing-app!<br><br>
+                <h5>Organize all your readings in one place!</h5>
+                With ReadingLog192, you can log all the readings you're assigned so you can see all upcoming readings in one place! <br>
+                For each reading you'll be able to enter the due date, title, author, number of pages, the course the reading is assigned for, and a URL to the reading, if you have one.<br>
+                Whenever you make progress in the reading, you can update your progress by selecting the paper you read among the ones you logged before, and note what page you are now on.<br>
+                From your dashboard you can easily see a graph showing how many pages you should be reading per day, forms to log progress and create a new reading, and all upcoming readings and finished readings.<br>
+                No more shuffling around to remember the due date for readings or struggling to relocate links to the readings!<br><br>
+                <h5>Keep track of reading progress!</h5>
+                Wondering how many pages you should be reading of that paper to have the reading done by the deadline?<br>
+                ReadingLog192 has a reading progress page that does just that for you!<br>
+                You can see the total number of pages you should be reading per day to get the readings done by all their deadlines.<br>
+                You can also see the total number of pages you should be reading per day to get the readings done for a specific class of yours!<br><br>
+                <h5>Find out some interesting statistics about your readings!</h5>
+                Ever feel like there's just this one class that assigns <i>thousands</i> of readings? <br>
+                Well, with ReadingLog192 you can see just how many classes readings that course has been assigning you!<br>
+                Ontop of that, you can also easily see the number of papers you've read, the number of pages you've read, the average length of all your readings, and the number of readings assigned by an author.<br><br>
+                What are you waiting for?
                 <a href="/accounts">Join</a> ReadingLog192 today!</p>
                 
             </main>
