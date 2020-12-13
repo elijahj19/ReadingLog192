@@ -161,12 +161,11 @@ def readingProgress_view(request):
     
     graphs = []
     courses = request.user.courses.all()
-    papers = request.user.papers.all().order_by('dueDate')
-    dateFormat = '%Y-%m-%d %H:%M'
+    
     today = timezone.now()
 
     # Total Pages Needed to Read per Day until all due dates
-    papersFiltered = request.user.papers.order_by('dueDate')
+    papersFiltered = request.user.papers.all().order_by('dueDate')
     pagesDays = []
     dates = []
     for paper in papersFiltered:
