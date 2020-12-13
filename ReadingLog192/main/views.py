@@ -64,11 +64,11 @@ def dashboard_view(request):
 
     # create dashboard image showing graph of how many pages need to read a day
     today = timezone.now()
-    papersFiltered = request.user.papers.filter(dueDate__gte=today).order_by('dueDate')
+    papersFiltered = request.user.papers.order_by('dueDate')
     pagesDays = []
     dates = []
     for paper in papersFiltered:
-        daysUntil = (paper.dueDate.date() - today.date()).days + 1
+        daysUntil = max((paper.dueDate.date() - today.date()).days, 0) + 1
         pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
         for i in range(daysUntil):
             if len(pagesDays) > i:
@@ -166,11 +166,11 @@ def readingProgress_view(request):
     today = timezone.now()
 
     # Total Pages Needed to Read per Day until all due dates
-    papersFiltered = request.user.papers.filter(dueDate__gte=today).order_by('dueDate')
+    papersFiltered = request.user.papers.order_by('dueDate')
     pagesDays = []
     dates = []
     for paper in papersFiltered:
-        daysUntil = (paper.dueDate.date() - today.date()).days + 1
+        daysUntil = max((paper.dueDate.date() - today.date()).days, 0) + 1
         pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
         for i in range(daysUntil):
             if len(pagesDays) > i:
@@ -194,11 +194,11 @@ def readingProgress_view(request):
 
     # Total Pages Needed to Read per Day by Class
     for course in courses:
-        papersFiltered = course.paper.filter(dueDate__gte=today, user=request.user).order_by('dueDate')
+        papersFiltered = course.paper.filter(user=request.user).order_by('dueDate')
         pagesDays = []
         dates = []
         for paper in papersFiltered:
-            daysUntil = (paper.dueDate.date() - today.date()).days + 1
+            daysUntil = max((paper.dueDate.date() - today.date()).days, 0) + 1
             pagesPerDay = (paper.totalPages - paper.readPages) / daysUntil
             for i in range(daysUntil):
                 if len(pagesDays) > i:
