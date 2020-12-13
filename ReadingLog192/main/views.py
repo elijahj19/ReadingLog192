@@ -8,6 +8,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 import urllib, base64
+import math
 
 
 ## PAGE GET REQUESTS
@@ -88,7 +89,7 @@ def dashboard_view(request):
     uri = urllib.parse.quote(base64.b64encode(buf.read()))
     plt.close()
         
-    return render(request, 'dashboard.html', {'papers': papers, 'pagesPerDayGraph': uri})
+    return render(request, 'dashboard.html', {'papers': papers, 'pagesPerDayGraph': uri, 'pagesToReadToday': math.ceil(pagesDays[0]) if len(pagesDays) > 0 else 0})
 
 # this is the HTML view for logging in signing up
 def accounts_view(request):
@@ -135,9 +136,10 @@ def authors_view(request):
     except:
         pass
     for paper in papers:
+        print(str(paper))
         if paper.author not in authors and paper.author != '':
             authors.append(paper.author)
-    return render(request, 'authors.html', {'authors': authors, 'papers': paper})
+    return render(request, 'authors.html', {'authors': authors, 'papers': papers})
 
 # shows all the upcoming and finished readings for an author
 def authorReadings_view(request):
@@ -218,7 +220,7 @@ def readingProgress_view(request):
         graphs.append({'title': f'{course.name} Pages Per Day', 'image': uri})
         plt.close()
 
-    return render(request, 'readingProgress.html', {"graphs": graphs})
+    return render(request, 'readingProgress.html', {"graphs": graphs, 'pagesToReadToday': math.ceil(pagesDays[0]) if len(pagesDays) > 0 else 0})
 
 def readingStats_view(request):
     # if user is not logged in, reroute them to signin page and display error
@@ -281,7 +283,10 @@ def readingStats_view(request):
     graphs.append({'title': f'Number of Pages Assigned By Course', 'image': uri})
     plt.close()
 
-    return render(request, 'readingStats.html', {'graphs': graphs, 'pagesRead': pagesRead, 'avgPaperLength': avgPaperLength, 'papersRead': papersRead})
+    # sort readings by total pages needed to read, uses magic methods
+    sortedPapers = [paper for paper in papers if paper.readPages < paper.totalPages]
+    sortedPapers.sort()
+    return render(request, 'readingStats.html', {'graphs': graphs, 'pagesRead': pagesRead, 'avgPaperLength': avgPaperLength, 'papersRead': papersRead, 'sortedPapers': sortedPapers})
 
 ## ----------------------------------------------------------------------------------------
 

@@ -27,6 +27,17 @@ class Paper(models.Model):
     def __str__(self):
         return f'{self.title} by {self.author}, {self.totalPages} pages due {self.addDate}'
 
+    # a paper is larger than another if it has more pages, the rest of the logic follows
+    def __gt__(self, other):
+        return self.totalPages > other.totalPages
+    def __lt__(self, other):
+        return self.totalPages < other.totalPages
+    def __ge__(self, other):
+        return self.totalPages >= other.totalPages
+    def __le__(self, other):
+        return self.totalPages <= other.totalPages
+    
+
 ## extended version of user, custom user class
 class User(AbstractUser):
     courses = models.ManyToManyField(Course, related_name="user") # courses the user is taking
