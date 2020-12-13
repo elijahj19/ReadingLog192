@@ -177,7 +177,7 @@ def readingProgress_view(request):
             else:
                 pagesDays.append(pagesPerDay)
                 dates.append(today.date() + datetime.timedelta(days=i))
-
+    pagesToReadPerDay = len(pagesDays)
     plt.plot(dates, pagesDays)
     plt.ylabel('Pages To Read')
     plt.xlabel('Date')
@@ -219,7 +219,7 @@ def readingProgress_view(request):
         graphs.append({'title': f'{course.name} Pages Per Day', 'image': uri})
         plt.close()
 
-    return render(request, 'readingProgress.html', {"graphs": graphs, 'pagesToReadToday': math.ceil(pagesDays[0]) if len(pagesDays) > 0 else 0})
+    return render(request, 'readingProgress.html', {"graphs": graphs, 'pagesToReadToday': pagesToReadPerDay})
 
 def readingStats_view(request):
     # if user is not logged in, reroute them to signin page and display error
